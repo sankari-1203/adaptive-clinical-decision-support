@@ -1,0 +1,27 @@
+{
+    "project_name": "Diabetes Risk Prediction",
+    "disease": "Diabetes",
+    "description": "Multi-model uncertainty-aware ensemble clinical decision support pipeline for diabetes mellitus risk estimation.",
+    "models": [
+        "Logistic Regression",
+        "SVM",
+        "Random Forest",
+        "XGBoost"
+    ],
+    "features": [
+        "gender",
+        "age",
+        "hypertension",
+        "heart_disease",
+        "smoking_history",
+        "bmi",
+        "HbA1c_level",
+        "blood_glucose_level"
+    ],
+    "categorical_features": [
+        "gender",
+        "smoking_history"
+    ],
+    "evaluation_metric": "F1-Score",
+    "version": "1.0.0"
+}

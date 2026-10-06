@@ -1,0 +1,27 @@
+{
+    "project_name": "Cardiovascular Disease Risk Prediction",
+    "disease": "Cardiovascular",
+    "description": "Multi-model uncertainty-aware ensemble clinical decision support pipeline for cardiovascular risk estimation.",
+    "models": [
+        "Logistic Regression",
+        "SVM",
+        "Random Forest",
+        "XGBoost"
+    ],
+    "features": [
+        "age_years",
+        "gender",
+        "height",
+        "weight",
+        "ap_hi",
+        "ap_lo",
+        "cholesterol",
+        "gluc",
+        "smoke",
+        "alco",
+        "active"
+    ],
+    "categorical_features": [],
+    "evaluation_metric": "F1-Score",
+    "version": "1.0.0"
+}

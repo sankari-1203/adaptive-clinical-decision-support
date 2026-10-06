@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adaptive Clinical Decision Support System</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+﻿:root {
+  --primary: #1e3a8a;
+  --primary-hover: #172554;
+  --accent: #0284c7;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-focus: #38bdf8;
+  --risk-color: #dc2626;
+  --risk-bg: #fef2f2;
+  --safe-color: #059669;
+  --safe-bg: #f0fdf4;
+  --warn-color: #d97706;
+  --warn-bg: #fffbeb;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  padding: 28px 32px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.header-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  color: #38bdf8;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+/* Regulatory Bar */
+.regulatory-bar {
+  background: #f1f5f9;
+  border-left: 4px solid var(--accent);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Card base */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+  margin-bottom: 20px;
+}
+
+.badge-category {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Disease Selector */
+.selector-control {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.selector-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.disease-dropdown {
+  flex: 1;
+  max-width: 450px;
+}
+
+.pipeline-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Form Styles */
+.header-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.preset-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.clinical-grid-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-input,
+.form-select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #ffffff;
+  color: var(--text-main);
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.form-action-row {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #cbd5e1;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.predict-btn {
+  padding: 14px 20px;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Models Grid */
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.model-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  background: #fbfcfd;
+}
+
+.model-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.model-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.model-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.tag-risk {
+  background: var(--risk-bg);
+  color: var(--risk-color);
+}
+
+.tag-safe {
+  background: var(--safe-bg);
+  color: var(--safe-color);
+}
+
+.model-metrics-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.fill-risk {
+  background: var(--risk-color);
+}
+
+.fill-safe {
+  background: var(--safe-color);
+}
+
+/* Ensemble Grid */
+.ensemble-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.ensemble-tile {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.highlight-tile {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.tile-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.tile-number {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.tile-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.badge-reliability {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.badge-high {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-low {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Decision Card */
+.decision-card {
+  border-left: 6px solid var(--primary);
+}
+
+.decision-high-risk {
+  border-left-color: var(--risk-color);
+  background: #fffafa;
+}
+
+.decision-low-risk {
+  border-left-color: var(--safe-color);
+  background: #fcfdfc;
+}
+
+.decision-med-risk {
+  border-left-color: var(--warn-color);
+  background: #fffdfa;
+}
+
+.decision-uncertain {
+  border-left-color: #8b5cf6;
+  background: #fbfaff;
+}
+
+.badge-decision-risk {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: #0f172a;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.decision-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.decision-subtitle {
+  color: #475569;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.recommendation-box {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.recommendation-heading {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.recommendation-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.regulatory-disclaimer-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.disclaimer-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* SHAP Card */
+.shap-summary-callout {
+  background: #f0fdf4;
+  border-left: 4px solid var(--safe-color);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.shap-legend {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.color-risk {
+  background: var(--risk-color);
+}
+
+.color-protective {
+  background: var(--safe-color);
+}
+
+.shap-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.shap-bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 90px;
+  align-items: center;
+  gap: 14px;
+}
+
+.shap-feature-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.shap-feature-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.shap-patient-val {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.shap-bar-track {
+  height: 14px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.shap-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.shap-risk {
+  background: var(--risk-color);
+}
+
+.shap-protective {
+  background: var(--safe-color);
+}
+
+.shap-val-col {
+  text-align: right;
+}
+
+.shap-val-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.text-risk {
+  color: var(--risk-color);
+}
+
+.text-protective {
+  color: var(--safe-color);
+}
+
+.shap-disclaimer-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Spinner */
+.spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Banner */
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    const { useState } = React;
+
+    const DIABETES_DEFAULTS = {
+      gender: "Female",
+      age: 45,
+      hypertension: 0,
+      heart_disease: 0,
+      smoking_history: "never",
+      bmi: 25.4,
+      HbA1c_level: 5.8,
+      blood_glucose_level: 110,
+    };
+
+    const CARDIO_DEFAULTS = {
+      age_years: 50.4,
+      gender: 1,
+      height: 168.0,
+      weight: 62.0,
+      ap_hi: 110.0,
+      ap_lo: 80.0,
+      cholesterol: 1,
+      gluc: 1,
+      smoke: 0,
+      alco: 0,
+      active: 1,
+    };
+
+    const PRESETS = {
+      diabetes: {
+        normal: { gender: "Female", age: 38, hypertension: 0, heart_disease: 0, smoking_history: "never", bmi: 22.1, HbA1c_level: 5.2, blood_glucose_level: 95 },
+        elevated: { gender: "Male", age: 62, hypertension: 1, heart_disease: 1, smoking_history: "current", bmi: 34.2, HbA1c_level: 8.4, blood_glucose_level: 210 },
+        borderline: { gender: "Female", age: 52, hypertension: 1, heart_disease: 0, smoking_history: "former", bmi: 28.5, HbA1c_level: 6.4, blood_glucose_level: 140 }
+      },
+      cardiovascular: {
+        normal: { age_years: 50.4, gender: 1, height: 168.0, weight: 62.0, ap_hi: 110.0, ap_lo: 80.0, cholesterol: 1, gluc: 1, smoke: 0, alco: 0, active: 1 },
+        elevated: { age_years: 64.0, gender: 2, height: 172.0, weight: 92.0, ap_hi: 165.0, ap_lo: 105.0, cholesterol: 3, gluc: 2, smoke: 1, alco: 1, active: 0 },
+        borderline: { age_years: 54.0, gender: 1, height: 162.0, weight: 76.0, ap_hi: 132.0, ap_lo: 86.0, cholesterol: 2, gluc: 1, smoke: 0, alco: 0, active: 1 }
+      }
+    };
+
+    function App() {
+      const [selectedDisease, setSelectedDisease] = useState("diabetes");
+      const [formData, setFormData] = useState(DIABETES_DEFAULTS);
+      const [predictionResult, setPredictionResult] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [errorMsg, setErrorMsg] = useState(null);
+
+      const handleDiseaseChange = (disease) => {
+        setSelectedDisease(disease);
+        setPredictionResult(null);
+        setErrorMsg(null);
+        setFormData(disease === "diabetes" ? DIABETES_DEFAULTS : CARDIO_DEFAULTS);
+      };
+
+      const handleFieldChange = (field, val) => {
+        setFormData(prev => ({ ...prev, [field]: val }));
+      };
+
+      const handleLoadPreset = (key) => {
+        const p = PRESETS[selectedDisease]?.[key];
+        if (p) {
+          setFormData({ ...p });
+          setPredictionResult(null);
+          setErrorMsg(null);
+        }
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrorMsg(null);
+        try {
+          const res = await fetch(`/api/predict/${selectedDisease}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+          });
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.detail || "Prediction request failed.");
+          }
+          const data = await res.json();
+          setPredictionResult(data);
+        } catch (err) {
+          setErrorMsg(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const isDiabetes = selectedDisease === "diabetes";
+      const ens = predictionResult?.ensemble_metrics;
+      const shap = predictionResult?.shap_explanation;
+
+      return (
+        <div className="app-container">
+          <header className="app-header">
+            <div className="header-brand-row">
+              <svg className="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              <div>
+                <h1>ADAPTIVE CLINICAL DECISION SUPPORT</h1>
+                <p className="header-subtitle">
+                  Uncertainty-Aware Multi-Model Ensemble Learning & SHAP Explainability System
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <div className="regulatory-bar">
+            <strong>Clinical Notice:</strong> For clinical decision support only. This prediction does not replace professional medical evaluation.
+          </div>
+
+          <div className="card">
+            <div className="section-header">
+              <span className="badge-category">SELECT CLINICAL PROTOCOL</span>
+              <h2>Active Disease Pipeline</h2>
+            </div>
+            <div className="selector-control">
+              <label className="selector-label">Disease Target:</label>
+              <select
+                className="form-select disease-dropdown"
+                value={selectedDisease}
+                onChange={(e) => handleDiseaseChange(e.target.value)}
+                disabled={loading}
+              >
+                <option value="diabetes">Diabetes Mellitus Pipeline (8 Biomarkers)</option>
+                <option value="cardiovascular">Cardiovascular Disease Pipeline (11 Clinical Indicators)</option>
+              </select>
+            </div>
+            <p className="pipeline-note">
+              {isDiabetes
+                ? "Loads saved Diabetes models (LR, SVM, RF, XGBoost) and categorical encoders. Independent feature space."
+                : "Loads saved Cardiovascular models (LR, SVM, RF, XGBoost) and standard scaler. Independent feature space."}
+            </p>
+          </div>
+
+          {errorMsg && (
+            <div className="error-banner">
+              <strong>Clinical Pipeline Error: </strong> {errorMsg}
+            </div>
+          )}
+
+          <div className="card">
+            <div className="section-header">
+              <div className="header-title-row">
+                <span className="badge-category">STRUCTURED CLINICAL INPUT</span>
+                <div className="preset-buttons">
+                  <span className="preset-label">Demonstration Cases:</span>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleLoadPreset("normal")} disabled={loading}>Normal Case</button>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleLoadPreset("elevated")} disabled={loading}>Elevated Risk Case</button>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleLoadPreset("borderline")} disabled={loading}>Borderline Case</button>
+                </div>
+              </div>
+              <h2>Patient Clinical Information</h2>
+            </div>
+
+            <form onSubmit={handleSubmit} className="clinical-grid-form">
+              {isDiabetes ? (
+                <>
+                  <div className="form-group">
+                    <label>Gender</label>
+                    <select className="form-select" value={formData.gender || "Female"} onChange={(e) => handleFieldChange("gender", e.target.value)} disabled={loading}>
+                      <option value="Female">Female</option>
+                      <option value="Male">Male</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" step="1" min="1" max="120" className="form-input" value={formData.age ?? 45} onChange={(e) => handleFieldChange("age", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Hypertension</label>
+                    <select className="form-select" value={formData.hypertension ?? 0} onChange={(e) => handleFieldChange("hypertension", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={0}>No (0)</option>
+                      <option value={1}>Yes (1)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Heart Disease</label>
+                    <select className="form-select" value={formData.heart_disease ?? 0} onChange={(e) => handleFieldChange("heart_disease", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={0}>No (0)</option>
+                      <option value={1}>Yes (1)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Smoking History</label>
+                    <select className="form-select" value={formData.smoking_history || "never"} onChange={(e) => handleFieldChange("smoking_history", e.target.value)} disabled={loading}>
+                      <option value="never">Never</option>
+                      <option value="No Info">No Info</option>
+                      <option value="current">Current</option>
+                      <option value="former">Former</option>
+                      <option value="ever">Ever</option>
+                      <option value="not current">Not Current</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>BMI (kg/m²)</label>
+                    <input type="number" step="0.1" min="10" max="90" className="form-input" value={formData.bmi ?? 25.4} onChange={(e) => handleFieldChange("bmi", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>HbA1c Level (%)</label>
+                    <input type="number" step="0.1" min="3.0" max="16.0" className="form-input" value={formData.HbA1c_level ?? 5.8} onChange={(e) => handleFieldChange("HbA1c_level", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Blood Glucose (mg/dL)</label>
+                    <input type="number" step="1" min="40" max="400" className="form-input" value={formData.blood_glucose_level ?? 110} onChange={(e) => handleFieldChange("blood_glucose_level", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" step="0.1" min="18" max="100" className="form-input" value={formData.age_years ?? 50.4} onChange={(e) => handleFieldChange("age_years", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Gender</label>
+                    <select className="form-select" value={formData.gender ?? 1} onChange={(e) => handleFieldChange("gender", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={1}>Female (1)</option>
+                      <option value={2}>Male (2)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" step="0.5" min="100" max="250" className="form-input" value={formData.height ?? 168.0} onChange={(e) => handleFieldChange("height", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.5" min="30" max="250" className="form-input" value={formData.weight ?? 62.0} onChange={(e) => handleFieldChange("weight", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Systolic BP (ap_hi mmHg)</label>
+                    <input type="number" step="1" min="60" max="240" className="form-input" value={formData.ap_hi ?? 110.0} onChange={(e) => handleFieldChange("ap_hi", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Diastolic BP (ap_lo mmHg)</label>
+                    <input type="number" step="1" min="40" max="160" className="form-input" value={formData.ap_lo ?? 80.0} onChange={(e) => handleFieldChange("ap_lo", parseFloat(e.target.value))} disabled={loading} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Cholesterol Level</label>
+                    <select className="form-select" value={formData.cholesterol ?? 1} onChange={(e) => handleFieldChange("cholesterol", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={1}>1: Normal</option>
+                      <option value={2}>2: Above Normal</option>
+                      <option value={3}>3: Well Above Normal</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Glucose Level</label>
+                    <select className="form-select" value={formData.gluc ?? 1} onChange={(e) => handleFieldChange("gluc", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={1}>1: Normal</option>
+                      <option value={2}>2: Above Normal</option>
+                      <option value={3}>3: Well Above Normal</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Smoker</label>
+                    <select className="form-select" value={formData.smoke ?? 0} onChange={(e) => handleFieldChange("smoke", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={0}>No (0)</option>
+                      <option value={1}>Yes (1)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Alcohol Intake</label>
+                    <select className="form-select" value={formData.alco ?? 0} onChange={(e) => handleFieldChange("alco", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={0}>No (0)</option>
+                      <option value={1}>Yes (1)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Physical Activity</label>
+                    <select className="form-select" value={formData.active ?? 1} onChange={(e) => handleFieldChange("active", parseInt(e.target.value, 10))} disabled={loading}>
+                      <option value={1}>Active (1)</option>
+                      <option value={0}>Sedentary (0)</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <div className="form-action-row">
+                <button type="submit" className="btn btn-primary btn-block predict-btn" disabled={loading}>
+                  {loading ? (
+                    <span className="spinner-wrap">
+                      <span className="spinner"></span> Processing Multi-Model Inference...
+                    </span>
+                  ) : isDiabetes ? "PREDICT DIABETES RISK" : "PREDICT CARDIOVASCULAR RISK"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {ens && (
+            <>
+              <div className={`card decision-card ${ens.final_prediction === 1 ? 'decision-high-risk' : 'decision-low-risk'}`}>
+                <div className="decision-header">
+                  <span className="badge-decision-risk">{ens.risk_category}</span>
+                  <h2 className="decision-title">{ens.decision_title}</h2>
+                  <p className="decision-subtitle">{ens.decision_subtitle}</p>
+                </div>
+                <div className="recommendation-box">
+                  <span className="recommendation-heading">ADAPTIVE CLINICAL RECOMMENDATION</span>
+                  <p className="recommendation-text">{ens.clinical_recommendation}</p>
+                </div>
+                <div className="regulatory-disclaimer-box">
+                  <span>{predictionResult.regulatory_notice}</span>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="section-header">
+                  <div className="header-title-row">
+                    <span className="badge-category">MULTI-MODEL AGGREGATION</span>
+                    <span className={`badge-reliability ${ens.reliability === 'HIGH' ? 'badge-high' : ens.reliability === 'MEDIUM' ? 'badge-medium' : 'badge-low'}`}>
+                      RELIABILITY: {ens.reliability}
+                    </span>
+                  </div>
+                  <h2>Adaptive Ensemble & Reliability Quantification</h2>
+                </div>
+                <div className="ensemble-grid">
+                  <div className="ensemble-tile highlight-tile">
+                    <span className="tile-title">Ensemble Risk Probability</span>
+                    <span className="tile-number">{ens.risk_probability_pct}</span>
+                    <span className="tile-subtitle">Weighted by F1-Scores (Σ w_i * P_i)</span>
+                  </div>
+                  <div className="ensemble-tile">
+                    <span className="tile-title">Model Agreement</span>
+                    <span className="tile-number">{ens.agreement_score_pct}</span>
+                    <span className="tile-subtitle">Majority vote proportion</span>
+                  </div>
+                  <div className="ensemble-tile">
+                    <span className="tile-title">Model Disagreement</span>
+                    <span className="tile-number">{ens.disagreement_score_pct}</span>
+                    <span className="tile-subtitle">100% - Agreement Score</span>
+                  </div>
+                  <div className="ensemble-tile">
+                    <span className="tile-title">Weighted Confidence</span>
+                    <span className="tile-number">{ens.weighted_confidence_pct}</span>
+                    <span className="tile-subtitle">Σ w_i * max(P_i, 1-P_i)</span>
+                  </div>
+                  <div className="ensemble-tile">
+                    <span className="tile-title">Vote Entropy (H)</span>
+                    <span className="tile-number">{ens.vote_entropy_str}</span>
+                    <span className="tile-subtitle">-Σ p_k * log₂(p_k)</span>
+                  </div>
+                  <div className="ensemble-tile">
+                    <span className="tile-title">Uncertainty Score</span>
+                    <span className="tile-number">{ens.uncertainty_score_str}</span>
+                    <span className="tile-subtitle">0.6*(1-Conf) + 0.4*Entropy</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="section-header">
+                  <span className="badge-category">INDEPENDENT INFERENCE</span>
+                  <h2>Individual Model Predictions</h2>
+                </div>
+                <div className="models-grid">
+                  {predictionResult.model_results.map((m, idx) => (
+                    <div key={idx} className="model-card">
+                      <div className="model-header">
+                        <span className="model-name">{m.model}</span>
+                        <span className={`model-tag ${m.prediction_binary === 1 ? 'tag-risk' : 'tag-safe'}`}>
+                          {m.prediction_label}
+                        </span>
+                      </div>
+                      <div className="model-metrics-row">
+                        <div className="metric-box">
+                          <span className="metric-label">Risk Probability</span>
+                          <span className="metric-value">{m.risk_probability_pct}</span>
+                        </div>
+                        <div className="metric-box">
+                          <span className="metric-label">Confidence</span>
+                          <span className="metric-value">{m.confidence_pct}</span>
+                        </div>
+                        <div className="metric-box">
+                          <span className="metric-label">F1 Weight</span>
+                          <span className="metric-value">{m.weight_pct}</span>
+                        </div>
+                      </div>
+                      <div className="progress-bar-container">
+                        <div className={`progress-fill ${m.prediction_binary === 1 ? 'fill-risk' : 'fill-safe'}`} style={{ width: `${m.risk_probability * 100}%` }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {shap && (
+                <div className="card">
+                  <div className="section-header">
+                    <span className="badge-category">EXPLAINABLE AI (XAI)</span>
+                    <h2>SHAP Biomarker Attributions</h2>
+                  </div>
+                  <div className="shap-summary-callout">
+                    <strong>Biomarker Impact Analysis: </strong> {shap.shap_summary}
+                  </div>
+                  <div className="shap-legend">
+                    <div className="legend-item"><span className="legend-color-box color-risk"></span><span>Risk-Increasing Factor</span></div>
+                    <div className="legend-item"><span className="legend-color-box color-protective"></span><span>Protective Factor</span></div>
+                  </div>
+                  <div className="shap-bars-list">
+                    {shap.feature_attributions.map((item, idx) => {
+                      const maxA = Math.max(...shap.feature_attributions.map(f => f.absolute_shap), 0.001);
+                      const isR = item.direction === "Risk-Increasing";
+                      return (
+                        <div key={idx} className="shap-bar-row">
+                          <div className="shap-feature-meta">
+                            <span className="shap-feature-name">{item.feature}</span>
+                            <span className="shap-patient-val">Value: {item.patient_value}</span>
+                          </div>
+                          <div className="shap-bar-track">
+                            <div className={`shap-bar-fill ${isR ? 'shap-risk' : 'shap-protective'}`} style={{ width: `${(item.absolute_shap / maxA) * 100}%` }}></div>
+                          </div>
+                          <div className="shap-val-col">
+                            <span className={`shap-val-badge ${isR ? 'text-risk' : 'text-protective'}`}>
+                              {item.shap_value > 0 ? `+${item.shap_value.toFixed(3)}` : item.shap_value.toFixed(3)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="shap-disclaimer-text"><em>Notice: {shap.disclaimer}</em></p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
