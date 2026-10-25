@@ -1,4 +1,4 @@
-﻿"""
+"""
 Model Loader Module
 Loads and caches disease-specific models, scalers, encoders, and weights once at startup.
 Never calls fit() or retraining. Fails with clear errors if any artifact is missing.
@@ -20,19 +20,27 @@ logger = logging.getLogger("cdss.model_loader")
 LOADED_ARTIFACTS: Dict[str, Dict[str, Any]] = {}
 
 def _resolve_artifact(directory: Path, filename: str) -> Path:
-    # First check directory itself
+    # First check directory itself (direct or .gz)
     direct_path = directory / filename
     if direct_path.exists():
         return direct_path
-    # Check models/ subfolder
+    gz_path = directory / f"{filename}.gz"
+    if gz_path.exists():
+        return gz_path
+
+    # Check models/ subfolder (direct or .gz)
     sub_path = directory / "models" / filename
     if sub_path.exists():
         return sub_path
+    sub_gz_path = directory / "models" / f"{filename}.gz"
+    if sub_gz_path.exists():
+        return sub_gz_path
+
     # Check results/ subfolder (for csv)
     res_path = directory / "results" / filename
     if res_path.exists():
         return res_path
-    raise FileNotFoundError(f"Required artifact '{filename}' not found in {directory}")
+    raise FileNotFoundError(f"Required artifact '{filename}' (or '{filename}.gz') not found in {directory}")
 
 def load_diabetes_artifacts(models_dir: Path = DIABETES_MODELS_DIR) -> Dict[str, Any]:
     logger.info(f"Loading Diabetes model artifacts from {models_dir}...")

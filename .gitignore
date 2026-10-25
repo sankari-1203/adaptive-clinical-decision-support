@@ -32,10 +32,13 @@ htmlcov/
 *.log
 .env
 
-# Large Trained Model Artifacts (>100MB blocked by GitHub)
-# Keep lightweight schema JSONs and evaluation CSVs tracked
-*.pkl
+# Large Uncompressed Trained Models (>100MB blocked by GitHub)
+# Keep *.pkl.gz and other lightweight models (<1MB) tracked
+*random_forest.pkl
+models/*/models/
 
 # Migration scripts
 migrate_*.py
+
+
 
