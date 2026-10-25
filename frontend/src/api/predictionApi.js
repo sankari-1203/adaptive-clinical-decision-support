@@ -3,7 +3,12 @@
  */
 import axios from 'axios';
 
-const API_BASE = import.meta.env?.VITE_API_BASE || '';
+const API_BASE =
+  import.meta.env?.VITE_API_BASE ||
+  (typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? ''
+    : 'https://adaptive-clinical-decision-support.onrender.com');
 
 const client = axios.create({
   baseURL: API_BASE,
