@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import DiseaseSelector from "./components/DiseaseSelector";
 import PatientForm from "./components/PatientForm";
 import ModelResults from "./components/ModelResults";
@@ -148,8 +148,10 @@ export default function App() {
       setPredictionResult(data);
     } catch (err) {
       console.error("Prediction failed:", err);
+      const targetUrl = (err.config?.baseURL || '') + (err.config?.url || '');
       const detail = err.response?.data?.detail || err.message || "An unexpected error occurred.";
-      setErrorMsg(typeof detail === "string" ? detail : JSON.stringify(detail));
+      const msg = typeof detail === "string" ? detail : JSON.stringify(detail);
+      setErrorMsg(targetUrl ? `${msg} (API: ${targetUrl})` : msg);
     } finally {
       setLoading(false);
     }
