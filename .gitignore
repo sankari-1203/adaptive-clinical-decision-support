@@ -1,4 +1,4 @@
-﻿# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -35,3 +35,7 @@ htmlcov/
 # Large Trained Model Artifacts (>100MB blocked by GitHub)
 # Keep lightweight schema JSONs and evaluation CSVs tracked
 *.pkl
+
+# Migration scripts
+migrate_*.py
+

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Decision Engine Module
 Converts ensemble risk, model agreement/disagreement, confidence, entropy,
 and uncertainty into clinical decision support statements.
@@ -69,33 +69,54 @@ def synthesize_clinical_decision(
             "Do not rely on automated prediction alone. Confirmatory clinical assessment required."
         )
 
-    # 3. Standard Adaptive Support Statement (per Section 8 & Section 16 specification)
-    if uncertainty_score < RELIABILITY_HIGH_THRESHOLD and disagreement_score <= DISAGREEMENT_LOW_THRESHOLD:
-        if final_prediction == 1:
+    # 3. Final Adaptive Clinical Recommendation (strictly follows training notebook & clinical logic)
+    if final_prediction == 1:
+        if reliability == "HIGH":
+            if "cardio" in d_lower:
+                clinical_recommendation = (
+                    "The ensemble predicts elevated cardiovascular risk with high reliability. "
+                    "Clinical evaluation should consider the patient's symptoms, risk factors and "
+                    "other relevant clinical information."
+                )
+            else:
+                clinical_recommendation = (
+                    "The ensemble predicts elevated diabetes risk with high reliability. "
+                    "Clinical evaluation should consider the patient's symptoms, risk factors, "
+                    "laboratory findings, and other relevant clinical information."
+                )
+        elif reliability == "MEDIUM":
             clinical_recommendation = (
-                f"HIGH CONFIDENCE — elevated predicted risk. Further clinical assessment is recommended."
+                f"The ensemble predicts {d_lower} risk, but "
+                "moderate uncertainty or model disagreement is present. "
+                "Additional clinical information and professional assessment are recommended."
             )
         else:
             clinical_recommendation = (
-                f"HIGHER RELIABILITY — models consistently indicate lower predicted risk; "
-                f"clinical context should still be considered."
-            )
-    elif uncertainty_score < RELIABILITY_MEDIUM_THRESHOLD:
-        if final_prediction == 1:
-            clinical_recommendation = (
-                f"MODERATE/LOW CONFIDENCE — predicted risk with model disagreement. "
-                f"Further clinical assessment is recommended."
-            )
-        else:
-            clinical_recommendation = (
-                f"MODERATE/LOW CONFIDENCE — lower predicted risk with model disagreement or uncertainty. "
-                f"Further clinical review is recommended."
+                f"The {d_lower} risk prediction has high uncertainty. "
+                "Do not rely on the automated prediction alone. "
+                "Further clinical assessment is recommended."
             )
     else:
-        clinical_recommendation = (
-            f"UNCERTAIN PREDICTION — model outputs are not sufficiently consistent. "
-            f"Review patient information and consider further assessment."
-        )
+        if reliability == "HIGH":
+            clinical_recommendation = (
+                f"The ensemble predicts low {d_lower} risk "
+                "with high reliability. Continue appropriate "
+                "preventive care and routine monitoring based on "
+                "patient context."
+            )
+        elif reliability == "MEDIUM":
+            clinical_recommendation = (
+                f"The ensemble predicts low {d_lower} risk, "
+                "but model uncertainty or disagreement is present. "
+                "Additional clinical review is recommended."
+            )
+        else:
+            clinical_recommendation = (
+                f"The prediction indicates low {d_lower} risk "
+                "but has high uncertainty. The result should be "
+                "interpreted cautiously and should not replace "
+                "clinical assessment."
+            )
 
     return {
         "risk_category": risk_category,
